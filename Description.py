@@ -17,7 +17,6 @@ class literal:
         :param value: The value
         :return:
         """
-
         self.value = value
 
     def get_value(self):
