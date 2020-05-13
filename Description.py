@@ -26,24 +26,125 @@ class literal:
         """
         return self.value
 
-class Description:
+class Component:
     """
     This class represent a single description of a component
     """
 
-    def __init__(self,inputs,output,cnf):
+    def __init__(self,inputs,output,functionality):
         """
         The constructor of the class
         :param inputs: The inputs of the component (group of literals)
         :param output: The output of the component (a literal)
-        :param cnf: The CNF expression that represents the functionality of the component
+        :param functionality: The functionality of the component
         """
         self.inputs = inputs
         self.output = output
-        self.cnf = cnf
+        self.health = literal("health")
+        self.functionality = functionality
+        self.cnf = self.get_CNF_representation()
+
+    def get_CNF_representation(self):
+
+        if self.functionality == "and":
+            return self.and_function()
+        elif self.functionality == "nand":
+            return self.nand_function()
+        elif self.functionality == "or":
+            return self.or_function()
+        elif self.functionality == "nor":
+            return self.nor_function()
+        elif self.functionality == "xor":
+            return self.xor_function()
+        elif self.functionality == "xnor":
+            return self.xnor_function()
+
+    def not_function(self):
+        if len(self.inputs)!=1:
+            raise Exception("More than one input")
+        # 1- health, 2- input, 3 - output
+        c1 = [-1,-2,-3]
+        c2 = [-1,2 ,3]
+        return [c1,c2]
+
+    def and_function(self):
+        if len(self.inputs)<2:
+            raise Exception("less than two input")
+        clauses = []
+        end_clause = [-1]
+        for i in range(len(self.inputs)):
+            clause = [-1,i+2,-1*(len(self.inputs)+2)]
+            end_clause.append(-1 * (i + 2))
+            clauses.append(clause)
+        end_clause.append(len(self.inputs) + 2)
+        clauses.append(end_clause)
+        return clauses
+
+    def nand_function(self):
+        if len(self.inputs)<2:
+            raise Exception("less than two input")
+        clauses = []
+        end_clause = [-1]
+        for i in range(len(self.inputs)):
+            clause = [-1,i+2,len(self.inputs)+2]
+            end_clause.append(-1 * (i + 2))
+            clauses.append(clause)
+        end_clause.append(-1*(len(self.inputs) + 2))
+        clauses.append(end_clause)
+        return clauses
+
+    def or_function(self):
+        if len(self.inputs)<2:
+            raise Exception("less than two input")
+        clauses = []
+        end_clause = [-1]
+        for i in range(len(self.inputs)):
+            clause = [-1,-1*(i+2),len(self.inputs)+2]
+            end_clause.append(i + 2)
+            clauses.append(clause)
+        end_clause.append(-1*(len(self.inputs) + 2))
+        clauses.append(end_clause)
+        return clauses
+
+    def nor_function(self):
+        if len(self.inputs) < 2:
+            raise Exception("less than two input")
+        clauses = []
+        end_clause = [-1]
+        for i in range(len(self.inputs)):
+            clause = [-1, -1*(i+2), -1*(len(self.inputs) + 2)]
+            end_clause.append(i + 2)
+            clauses.append(clause)
+        end_clause.append(len(self.inputs) + 2)
+        clauses.append(end_clause)
+        return clauses
+
+    def xor_function(self):
+        if len(self.inputs)!=2:
+            raise Exception("not two inputs")
+        # 1- health, 2- input1 , 3 - input2, 4- output
+        c1 = [-1, -2, -3 , -4]
+        c2 = [-1, 2 ,3, -4]
+        c3 = [-1, 2 ,-3, 4]
+        c4 = [-1, -2 ,3, 4]
+
+        return [c1,c2,c3,c4]
+
+    def xnor_function(self):
+        if len(self.inputs) != 2:
+            raise Exception("not two inputs")
+
+        # 1- health, 2- input1 , 3 - input2, 4- output
+        c1 = [-1, -2, -3, 4]
+        c2 = [-1, 2, 3, 4]
+        c3 = [-1, 2, -3, -4]
+        c4 = [-1, -2, 3, -4]
+
+        return [c1, c2, c3, c4]
 
 
-
-
-
-
+func = "xnor"
+des1 = Component([1,2],[1],func)
+#des2 = Description([1,2,3],[1],func)
+print(des1.cnf)
+#print(des2.function_converters)
