@@ -45,6 +45,10 @@ class Component:
         self.cnf = self.get_CNF_representation()
 
     def get_CNF_representation(self):
+        """
+        This function will return the CNF representation of the component
+        :return: TEH cnf representation of the component
+        """
 
         if self.functionality == "and":
             return self.and_function()
@@ -60,6 +64,10 @@ class Component:
             return self.xnor_function()
 
     def not_function(self):
+        """
+        CNF not function
+        :return: CNF not function
+        """
         if len(self.inputs)!=1:
             raise Exception("More than one input")
         # 1- health, 2- input, 3 - output
@@ -68,6 +76,11 @@ class Component:
         return [c1,c2]
 
     def and_function(self):
+        """
+        CNF and function
+        :return: CNF and function
+        """
+
         if len(self.inputs)<2:
             raise Exception("less than two input")
         clauses = []
@@ -81,6 +94,11 @@ class Component:
         return clauses
 
     def nand_function(self):
+        """
+        CNF nand function
+        :return: CNF nand function
+        """
+
         if len(self.inputs)<2:
             raise Exception("less than two input")
         clauses = []
@@ -94,6 +112,11 @@ class Component:
         return clauses
 
     def or_function(self):
+        """
+        CNF or function
+        :return: CNF or function
+        """
+
         if len(self.inputs)<2:
             raise Exception("less than two input")
         clauses = []
@@ -107,6 +130,11 @@ class Component:
         return clauses
 
     def nor_function(self):
+        """
+        CNF nor function
+        :return: CNF nor function
+        """
+
         if len(self.inputs) < 2:
             raise Exception("less than two input")
         clauses = []
@@ -120,6 +148,11 @@ class Component:
         return clauses
 
     def xor_function(self):
+        """
+        CNF xor function
+        :return: CNF xor function
+        """
+
         if len(self.inputs)!=2:
             raise Exception("not two inputs")
         # 1- health, 2- input1 , 3 - input2, 4- output
@@ -131,6 +164,11 @@ class Component:
         return [c1,c2,c3,c4]
 
     def xnor_function(self):
+        """
+        CNF xnor function
+        :return: CNF xnor function
+        """
+
         if len(self.inputs) != 2:
             raise Exception("not two inputs")
 
