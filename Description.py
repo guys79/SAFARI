@@ -33,6 +33,10 @@ class literal:
         return self.value
 
     def get_id(self):
+        """
+        This function will return the is of the literal
+        :return: The literal's id
+        """
         return self.id
 
 class Component:
