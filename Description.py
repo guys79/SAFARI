@@ -123,7 +123,6 @@ class Component:
         This function will return the CNF representation of the component
         :return: TEH cnf representation of the component
         """
-
         if self.functionality == "and":
             return self.and_function()
         elif self.functionality == "nand":
@@ -278,6 +277,38 @@ class booleanModel:
         for i in range(len(self.inputs)):
             self.names["input_%d"%(i+1)] = self.inputs[i]
 
+    def get_healthy_literals(self):
+        """
+        This function will return the healthy literals in the model
+        :return: The healthy literals in the model
+        """
+        healthy = []
+        for comp in self.names.values():
+            try:
+                healthy.append((comp.get_health(),comp))
+            except:
+                1
+        return healthy
+
+    def get_diagnosis(self,cnf_solution):
+        """
+        This function will infer from the cnf solution the diagnosis
+        :param cnf_solution: The cnf solution
+        :return: a list of the healthy components and a list of non-healthy components (the diagnosis)
+        """
+        healthy = self.get_healthy_literals()
+        healthy_comp = []
+        not_healthy_comp = []
+
+        for health in healthy:
+            value = cnf_solution[health[0].get_id()-1]
+            if value<0:
+                not_healthy_comp.append(health[1])
+            else:
+                healthy_comp.append(health[1])
+        return healthy_comp, not_healthy_comp
+
+
     def get_model_cnf(self):
         """
         This function will return the model's cnf
@@ -346,7 +377,7 @@ class booleanModel:
         self.num_of_literals +=1
         return literal(self.num_of_literals)
 
-    def create_component(self,inputs,num_of_input,func):
+    def create_component(self,inputs,func):
         """
         This function will create a component
         :param inputs: The inputs of the components (other components' outputs)
@@ -354,13 +385,12 @@ class booleanModel:
         :param func: The functionality of the component
         :return: The component
         """
-        for i in range(num_of_input - len(inputs)):
-            inputs.append(self.create_literal())
         health = self.create_literal()
         output = self.create_literal()
         comp_name = self.name_component(func)
         comp = Component(inputs, output, func, health,comp_name)
         self.names[comp_name] = comp
+        return comp
 
     def name_component(self,func):
         """
@@ -384,40 +414,49 @@ input_num = 3
 BM = booleanModel(input_num)
 
 # The inputs
-x1 = BM.names["input_1"]
-x2 = BM.names["input_2"]
-x3 = BM.names["input_3"]
+x = BM.names["input_1"]
+y = BM.names["input_2"]
+z = BM.names["input_3"]
 
-# First not gate
-BM.create_component([x1],1,"not")
-not_0 = BM.names["not_0"]
+# First AND gate
+and_0 = BM.create_component([x,y],"and")
 
-# Second not gate
-BM.create_component([x2],1,"not")
-not_1 = BM.names["not_1"]
+# Second AND gate
+and_1 = BM.create_component([z,y],"and")
 
-# First and gate
-BM.create_component([not_0.get_output(),x2],2,"and")
-and_0 = BM.names["and_0"]
+# First OR gate
+or_0 = BM.create_component([and_0.get_output(),and_1.get_output()],"or")
 
-# Second and gate
-BM.create_component([not_1.get_output(),x1],2,"and")
-and_1 = BM.names["and_1"]
-
-# Third and gate
-BM.create_component([not_1.get_output(),x3],2,"and")
-and_2 = BM.names["and_2"]
-
-# First or gate
-BM.create_component([and_0.get_output(),and_1.get_output()],2,"or")
-or_0 = BM.names["or_0"]
-
-# Second or gate
-BM.create_component([and_2.get_output(),or_0.get_output()],2,"or")
-or_1 = BM.names["or_1"]
-
+"""
 #print(BM.get_model_cnf())
 #print(BM.get_name_model_cnf())
 #BM.print_model_cnf()
-BM.print_name_model_cnf()
+#BM.print_name_model_cnf()
+#BM.print_model_cnf()
+#print(BM.get_model_cnf())
 
+import pycosat
+cnf = BM.get_model_cnf()
+cnf_name = BM.get_name_model_cnf()
+obs = []
+obs.append([1])
+obs.append([2])
+obs.append([-3])
+obs.append([9])
+
+for obser in obs:
+    cnf.append(obser)
+
+list_of_sol = list(pycosat.itersolve(cnf))
+
+g = True
+for solution in list_of_sol:
+    if g:
+        print(solution)
+        healthy, sick = BM.get_diagnosis(solution)
+        print("healthy")
+        print(healthy)
+        print("sick")
+        print(sick)
+
+"""

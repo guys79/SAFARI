@@ -1,5 +1,7 @@
 from trie import TrieNode
-
+import pycosat as sat_solver
+from Description import literal,Component,booleanModel
+import random
 def random_diagnosis(SD, a):
     """
     Returns a random diagnosis using SAT solver
@@ -7,7 +9,19 @@ def random_diagnosis(SD, a):
     :param a: The observation
     :return: A random diagnosis
     """
-    pass
+    cnf = SD.get_model_cnf()
+    for observation in a:
+        cnf.append(observation)
+
+    iter = sat_solver.itersolve(cnf)
+
+    solution_list = list(iter)
+    if len(solution_list) == 0:
+        raise Exception("F**k in observations")
+    random.shuffle(solution_list)
+    solution = solution_list[0]
+    healthy,not_healthy = SD.get_diagnosis(solution)
+    return healthy,not_healthy
 
 
 def improved_diagnosis(w):
@@ -16,7 +30,14 @@ def improved_diagnosis(w):
     :param w: The diagnosis
     :return: The diagnosis with one less negative literal
     """
-    pass
+    not_healthy = w[1]
+    healthy = w[0]
+    if len(not_healthy) > 0:
+        random.shuffle(not_healthy)
+        healthy.append(not_healthy[0])
+        not_healthy.remove(not_healthy[0])
+
+    return w[0], not_healthy
 
 
 def doesnt_entail_false(SD, a, w_tag):
@@ -27,7 +48,25 @@ def doesnt_entail_false(SD, a, w_tag):
     :param w_tag: The diagnosis
     :return: True IFF the above expression is satisfied
     """
-    pass
+    cnf_model = SD.get_model_cnf()
+    healthy = w_tag[0]
+    non_healthy = w_tag[1]
+
+    for comp in healthy:
+        cnf_model.append([comp.get_health().get_id()])
+
+    for comp in non_healthy:
+        cnf_model.append([-1*(comp.get_health().get_id())])
+
+    for observation in a:
+        cnf_model.append(observation)
+
+    iter = sat_solver.itersolve(cnf_model)
+
+    solution_list = list(iter)
+    if len(solution_list) == 0:
+        return False
+    return True
 
 
 def is_subsumed(R, w):
@@ -102,3 +141,43 @@ def hill_climb(DS, a,M,N):
         n+=1
     return R
 
+
+# create model
+input_num = 3
+BM = booleanModel(input_num)
+
+# The inputs
+x = BM.names["input_1"]
+y = BM.names["input_2"]
+z = BM.names["input_3"]
+
+# First AND gate
+and_0 = BM.create_component([x,y],"and")
+
+# Second AND gate
+and_1 = BM.create_component([z,y],"and")
+
+# First OR gate
+or_0 = BM.create_component([and_0.get_output(),and_1.get_output()],"or")
+
+cnf = BM.get_model_cnf()
+cnf_name = BM.get_name_model_cnf()
+obs = []
+obs.append([1])
+obs.append([2])
+obs.append([-3])
+#obs.append([9])
+obs.append([-9])
+w = random_diagnosis(BM,obs)
+to_print = []
+for comp in w[1]:
+    to_print.append(comp.get_name())
+print(to_print)
+w = improved_diagnosis(w)
+
+to_print = []
+for comp in w[1]:
+    to_print.append(comp.get_name())
+print(to_print)
+#w = ([and_0,or_0],[and_1])
+print(doesnt_entail_false(BM,obs,w))

@@ -72,15 +72,14 @@ def find_prefix(root, prefix: str) -> Tuple[bool, int]:
     return True, node.counter
 
 
-"""
+
 if __name__ == "__main__":
     root = TrieNode('*')
     add(root, "hackathon")
-    add(root, 'hack')
+    add(root, 'thon')
 
     print(find_prefix(root, 'hac'))
     print(find_prefix(root, 'hack'))
     print(find_prefix(root, 'hackathon'))
     print(find_prefix(root, 'ha'))
     print(find_prefix(root, 'hammer'))
-"""
