@@ -1,23 +1,44 @@
 import os
-from Description import literal,Component,booleanModel
+from Description import literal,booleanModel
+
 class BooleanModelParse:
-    def get_boolean_model_and_test(self,file_name):
+    """
+    This class will read from a text file, parse it and create from
+    it the boolean model
+    """
+
+    def get_boolean_model(self,file_name):
+        """
+        This function will return the boolean model from the given file
+        :param file_name: The name of the file
+        :return: The boolean model
+        """
         path = "%s\\res\\%s.isc.txt" % (os.getcwd(),file_name)
         text = self.get_text(path)
         node_num_to_name = self.node_num_to_name(text)
         input_name_to_literal = self.get_model_inputs(text)
-        for name in input_name_to_literal.keys():
-            lit = input_name_to_literal[name]
-           # print("%s - %s" % (name,lit.get_id()))
         model = self.build_model(text,node_num_to_name,input_name_to_literal)
         return model
+
+
     def get_text(self,path):
+        """
+        This function will get the file's text
+        :param path: The path to the file
+        :return: The files text
+        """
         file = open(path,'r')
         with file:
             data = file.readlines()
             return data
 
     def node_num_to_name(self,text):
+        """
+        This function will create a dictionary.
+        key - node number, value - the name of the node
+        :param text: The file's text
+        :return: The dictionary
+        """
         node_num_to_name = {}
         for line in text:
             split = line.split(" ")
@@ -27,6 +48,11 @@ class BooleanModelParse:
 
 
     def get_model_inputs(self,text):
+        """
+        This function will infer from the text the inputs and will crate them
+        :param text: The file's text
+        :return: A dictionary where the key is the name of the node and the value is the literal object
+        """
         names_to_literal = {}
         id = 1
         num_of_from = 0
@@ -47,6 +73,13 @@ class BooleanModelParse:
         return names_to_literal
 
     def build_model(self,text,node_num_to_name,name_to_literal):
+        """
+        This function will create the boolean model
+        :param text: The file's text
+        :param node_num_to_name: Dictionary, key - node number, value - node name
+        :param name_to_literal: Dictionary, key - node name, value - literal object
+        :return: The new boolean model
+        """
         inputs = list(name_to_literal.values())
         model = booleanModel(len(inputs),inputs=inputs)
         for i in range(len(text)):
@@ -73,6 +106,11 @@ class BooleanModelParse:
         return model
 
     def is_number(self,num):
+        """
+        This function will return true IFF the given string is a number
+        :param num: The given string
+        :return: True IFF the given string is a number
+        """
         try:
             int(num)
             return True
@@ -81,7 +119,7 @@ class BooleanModelParse:
 
 
 v = BooleanModelParse()
-mod = v.get_boolean_model_and_test("2")
+mod = v.get_boolean_model("2")
 cnf = mod.get_model_cnf()
 print(cnf)
 mod.print_name_model_cnf()
