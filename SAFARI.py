@@ -181,3 +181,4 @@ for comp in w[1]:
 print(to_print)
 #w = ([and_0,or_0],[and_1])
 print(doesnt_entail_false(BM,obs,w))
+print(len("111111111011111111011111111011111111"))

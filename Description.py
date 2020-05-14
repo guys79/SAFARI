@@ -264,18 +264,22 @@ class booleanModel:
     """
     This class represents the boolean model
     """
-    def __init__(self,input_num):
+    def __init__(self,input_num,inputs = None):
         """
         The constructor of the class
         :param input_num: The number of model inputs
         """
         self.num_of_literals = 0
         self.names = {}
-        self.inputs = []
-        for i in range(input_num):
-            self.inputs.append(self.create_literal())
+        if inputs == None:
+            self.inputs = []
+            for i in range(input_num):
+                self.inputs.append(self.create_literal())
+        else:
+            self.inputs = inputs
+            self.num_of_literals = len(self.inputs)
         for i in range(len(self.inputs)):
-            self.names["input_%d"%(i+1)] = self.inputs[i]
+            self.names["input_%d"%(self.inputs[i].get_id())] = self.inputs[i]
 
     def get_healthy_literals(self):
         """
