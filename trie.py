@@ -45,7 +45,7 @@ def add(root, new_diagnosis):
     node.diagnosic_finished = True
 
 
-def find_prefix(root, semi_diagnosis) -> Tuple[bool, int]:
+def find_prefix(root, semi_diagnosis) :
     """
     Check and return 
       1. If the prefix exsists in any of the words we added so far
@@ -56,7 +56,7 @@ def find_prefix(root, semi_diagnosis) -> Tuple[bool, int]:
     # If the root node has no children, then return False.
     # Because it means we are trying to search in an empty trie
     if not root.children:
-        return False, 0
+        return False, 0,None
     for name in components_names:
         component_not_found = True
         # Search through all the children of the present `node`
@@ -69,13 +69,11 @@ def find_prefix(root, semi_diagnosis) -> Tuple[bool, int]:
                 break
         # Return False anyway when we did not find a char.
         if component_not_found:
-            return False, 0
+            return False, 0,None
     # Well, we are here means we have found the prefix. Return true to indicate that
-    # And also the counter of the last node. This indicates how many words have this
+    # And also the counter of the last node. This indicates how many diagnosis have this
     # prefix
-    return True, node.counter
-
-
+    return True, node.counter,node
 
 if __name__ == "__main__":
     # create model
@@ -109,11 +107,19 @@ if __name__ == "__main__":
     add(root, diagnosis)
     print("is True:",find_prefix(root, diagnosis))
     print("is False:",find_prefix(root,[and_0]))
+    is_there = find_prefix(root, diagnosis)
+    print("is True:", is_there[0], ", the node returned:", is_there[2].component_name)
     #add another one:
     new_comp=BM.create_component([x,y],"or")
     diagnosis.append(new_comp)
     add(root, diagnosis)
     add(root,[and_0])
-    print("is True:",find_prefix(root, diagnosis))
+    is_there=find_prefix(root, diagnosis)
+    print("is True:",is_there[0],", the node returned:",is_there[2].component_name)
     print("is False:",find_prefix(root,[and_0,and_1]))
     print("is True:",find_prefix(root, [and_0]))
+#todo:add remove function that removes diagnosic.need to assume that the trie has only minimal diagnosic
+# so if we delete diagnosic we need to delete the leaf nodes recursively(if not leaf than there is another diagnostic that uses that nodr
+#todo: search function but not by order as it is now- to find diagnosis of [and_0,or_1] in trie where exist [and_0,and_1,or_1]
+#mabye to do it we can export all possible diagnosis to list of list of names and for list of names ask if contains what we
+#want to find?

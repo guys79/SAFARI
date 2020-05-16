@@ -72,7 +72,7 @@ def doesnt_entail_false(SD, a, w_tag):
 def is_subsumed(R, w):
     """
     returns true if w subsumed in R
-    :param R: Thr Trie
+    :param R: The Trie
     :param w: The diagnosis
     :return: True if w subsumed in R
     """
