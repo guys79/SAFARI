@@ -1,4 +1,4 @@
-from trie import TrieNode
+from DiagnosisData import DiagnosisData
 import pycosat as sat_solver
 from Description import literal,Component,booleanModel
 import random
@@ -69,33 +69,26 @@ def doesnt_entail_false(SD, a, w_tag):
     return True
 
 
-def is_subsumed(R, w):
-    """
-    returns true if w subsumed in R
-    :param R: The Trie
-    :param w: The diagnosis
-    :return: True if w subsumed in R
-    """
-    pass
+def is_subsumed(sub_sumed_indexes):
+    return sub_sumed_indexes is not None
 
 
 def add_to_trie(R, w):
     """
     This function will add the diagnosis to the Trie
-    :param R: Thr Trie
+    :param R: The Data Structure
     :param w: The diagnosis
-    :return:
     """
-    pass
+    R.add_diagnosis(w)
 
-def remove_subsumed(R,w):
+def remove_subsumed(R,sub_sumed_indexes):
     """
     Removes from R all the diagnoses that are subsumed in w
-    :param R: Thr Trie
-    :param w: The diagnosis
-    :return:
+    :param R: Thr Data Structure
+    :param sub_sumed_indexes: The diagnosis indexes to delete
     """
-    pass
+    for index in sub_sumed_indexes:
+        R.delete_diagnosis(index)
 
 
 def convert_trie_to_set_of_components(R):
@@ -121,7 +114,7 @@ def hill_climb(DS, a,M,N):
     COMPS = DS[1]
     OBS = DS[2]
 
-    R = TrieNode('*')
+    R = DiagnosisData()
     n = 0
     while n < N:
         w = random_diagnosis(SD,a)
@@ -133,13 +126,13 @@ def hill_climb(DS, a,M,N):
                 m = 0
             else:
                 m +=1
-
-        if not is_subsumed(R,w):
+        sub_sumed_index=R.search_sub_diagnosis()
+        if not is_subsumed(sub_sumed_index):
             add_to_trie(R,w)
-            remove_subsumed(R,w)
+            remove_subsumed(R,sub_sumed_index)
 
         n+=1
-    return R
+    convert_trie_to_set_of_components(R)
 
 
 # create model
