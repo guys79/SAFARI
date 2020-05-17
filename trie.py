@@ -94,6 +94,8 @@ if __name__ == "__main__":
     # First OR gate
     or_0 = BM.create_component([and_0.get_output(), and_1.get_output()], "or")
 
+    new_comp=BM.create_component([x,y],"or")
+
     cnf = BM.get_model_cnf()
     cnf_name = BM.get_name_model_cnf()
     obs = []
@@ -103,14 +105,15 @@ if __name__ == "__main__":
     # obs.append([9])
     obs.append([-9])
     diagnosis=[and_1,or_0]
+    diagnosis2=[or_0,new_comp]
     root = TrieNode('*')
-    add(root, diagnosis)
+    add(root, diagnosis2)
+    add(root,diagnosis)
     print("is True:",find_prefix(root, diagnosis))
     print("is False:",find_prefix(root,[and_0]))
     is_there = find_prefix(root, diagnosis)
     print("is True:", is_there[0], ", the node returned:", is_there[2].component_name)
     #add another one:
-    new_comp=BM.create_component([x,y],"or")
     diagnosis.append(new_comp)
     add(root, diagnosis)
     add(root,[and_0])
