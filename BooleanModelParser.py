@@ -118,9 +118,3 @@ class BooleanModelParse:
             return False
 
 
-v = BooleanModelParse()
-mod = v.get_boolean_model("2")
-cnf = mod.get_model_cnf()
-print(cnf)
-mod.print_name_model_cnf()
-mod.print_model_cnf()

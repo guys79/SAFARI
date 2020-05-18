@@ -70,7 +70,12 @@ def doesnt_entail_false(SD, a, w_tag):
 
 
 def is_subsumed(sub_sumed_indexes):
-    return sub_sumed_indexes is not None
+    """
+    Ths function will check if there are diagnoses that are subsumed using the indexes
+    :param sub_sumed_indexes: The list of indexes
+    :return: True if there is a diagnosis that is subsumed
+    """
+    return len(sub_sumed_indexes) !=0
 
 
 def add_to_trie(R, w):
