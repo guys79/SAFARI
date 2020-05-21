@@ -1,7 +1,9 @@
 from DiagnosisData import DiagnosisData
 import pycosat as sat_solver
-from Description import literal,Component,booleanModel
+from Description import booleanModel
 import random
+
+
 def random_diagnosis(SD, a):
     """
     Returns a random diagnosis using SAT solver
@@ -11,7 +13,7 @@ def random_diagnosis(SD, a):
     """
     cnf = SD.get_model_cnf()
     for observation in a:
-        cnf.append(observation)
+        cnf.append([observation])
 
     iter = sat_solver.itersolve(cnf)
 
@@ -32,12 +34,20 @@ def improved_diagnosis(w):
     """
     not_healthy = w[1]
     healthy = w[0]
-    if len(not_healthy) > 0:
-        random.shuffle(not_healthy)
-        healthy.append(not_healthy[0])
-        not_healthy.remove(not_healthy[0])
+    w_tag = [[],[]]
 
-    return w[0], not_healthy
+    for comp in healthy:
+        w_tag[0].append(comp)
+
+    for comp in not_healthy:
+        w_tag[1].append(comp)
+
+    if len(not_healthy) > 0:
+        random.shuffle(w_tag[1])
+        w_tag[0].append(w_tag[1][0])
+        w_tag[1].remove(w_tag[1][0])
+
+    return w_tag[0], w_tag[1]
 
 
 def doesnt_entail_false(SD, a, w_tag):
@@ -59,7 +69,7 @@ def doesnt_entail_false(SD, a, w_tag):
         cnf_model.append([-1*(comp.get_health().get_id())])
 
     for observation in a:
-        cnf_model.append(observation)
+        cnf_model.append([observation])
 
     iter = sat_solver.itersolve(cnf_model)
 
@@ -102,6 +112,7 @@ def convert_trie_to_set_of_components(R):
     :param R: The Trie
     :return: The group of diagnoses
     """
+    return R.get_all_diagnosis()
     pass
 
 
@@ -127,17 +138,19 @@ def hill_climb(DS, a,M,N):
         while m< M:
             w_tag = improved_diagnosis(w) # should be improved_diagnosis(w.p)
             if doesnt_entail_false(SD,a,w_tag):
+                if len(w_tag[1]) == 0:
+                    return []
                 w = w_tag
                 m = 0
             else:
                 m +=1
-        sub_sumed_index=R.search_sub_diagnosis()
+        sub_sumed_index = R.search_sub_diagnosis(w[1])
         if not is_subsumed(sub_sumed_index):
-            add_to_trie(R,w)
+            add_to_trie(R,w[1])
             remove_subsumed(R,sub_sumed_index)
 
         n+=1
-    convert_trie_to_set_of_components(R)
+    return convert_trie_to_set_of_components(R)
 
 
 # create model
@@ -158,25 +171,11 @@ and_1 = BM.create_component([z,y],"and")
 # First OR gate
 or_0 = BM.create_component([and_0.get_output(),and_1.get_output()],"or")
 
-cnf = BM.get_model_cnf()
-cnf_name = BM.get_name_model_cnf()
-obs = []
-obs.append([1])
-obs.append([2])
-obs.append([-3])
-#obs.append([9])
-obs.append([-9])
-w = random_diagnosis(BM,obs)
-to_print = []
-for comp in w[1]:
-    to_print.append(comp.get_name())
-print(to_print)
-w = improved_diagnosis(w)
+COMPS = [and_0,and_1,or_0]
+OBS = [x,y,z,or_0.get_output()]
 
-to_print = []
-for comp in w[1]:
-    to_print.append(comp.get_name())
-print(to_print)
-#w = ([and_0,or_0],[and_1])
-print(doesnt_entail_false(BM,obs,w))
-print(len("111111111011111111011111111011111111"))
+DS = [BM,COMPS,OBS]
+a = [x.get_id(),y.get_id(),1*(z.get_id()),-1*(or_0.get_output().get_id())]
+M = 4
+N = 4
+print(hill_climb(DS,a,M,N))

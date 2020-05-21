@@ -84,34 +84,4 @@ class DiagnosisData():
             diagnoses_list.append(diagnoses.get(index))
         return diagnoses_list
 
-from  BooleanModelParser import BooleanModelParse
-v = BooleanModelParse()
-mod = v.get_boolean_model("2")
-"""
-cnf = mod.get_model_cnf()
-print(cnf)
-mod.print_name_model_cnf()
-mod.print_model_cnf()
-"""
-nand_0 = mod.names["nand_0"]
-nand_1 = mod.names["nand_1"]
-nand_2 = mod.names["nand_2"]
-nand_3 = mod.names["nand_3"]
-d1 = {nand_0,nand_1,nand_2}
-d2 = {nand_0,nand_1,nand_3}
-d3 = {nand_3,nand_2}
-d4 = {nand_0,nand_1}
 
-
-dd = DiagnosisData()
-print(dd.get_all_diagnosis())
-dd.add_diagnosis(d1)
-print(dd.get_all_diagnosis())
-dd.add_diagnosis(d2)
-print(dd.get_all_diagnosis())
-dd.add_diagnosis(d3)
-print(dd.get_all_diagnosis())
-print(dd.search_sub_diagnosis(d4))
-dd.delete_diagnosis(0)
-print(dd.get_all_diagnosis())
-print(dd.search_sub_diagnosis(d4))
