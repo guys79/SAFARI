@@ -123,20 +123,25 @@ class Component:
         This function will return the CNF representation of the component
         :return: TEH cnf representation of the component
         """
-        if self.functionality == "and":
+        func = self.functionality.lower()
+        if func == "and":
             return self.and_function()
-        elif self.functionality == "nand":
+        elif func == "nand":
             return self.nand_function()
-        elif self.functionality == "or":
+        elif func == "or":
             return self.or_function()
-        elif self.functionality == "nor":
+        elif func == "nor":
             return self.nor_function()
-        elif self.functionality == "xor":
+        elif func == "xor":
             return self.xor_function()
-        elif self.functionality == "xnor":
+        elif func == "xnor":
             return self.xnor_function()
-        elif self.functionality == "not":
+        elif func == "not":
             return  self.not_function()
+        elif func == "buff":
+            return self.buff_function()
+        else:
+            raise Exception("Function not recognized")
 
 
     def not_function(self):
@@ -150,6 +155,16 @@ class Component:
         c1 = [-1*(self.health.get_id()),-1*(self.inputs[0].get_id()),-1*(self.output.get_id())]
         c2 = [-1*(self.health.get_id()),self.inputs[0].get_id() ,self.output.get_id()]
         return [c1,c2]
+
+    def buff_function(self):
+        """
+           CNF buff function
+           :return: CNF buff function
+        """
+        c1 = [-1*(self.health.get_id()),self.inputs[0].get_id(),self.output.get_id()]
+        c2 = [-1*(self.health.get_id()),-1*(self.inputs[0].get_id()),-1*(self.output.get_id())]
+        return [c1,c2]
+
 
     def and_function(self):
         """
