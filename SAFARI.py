@@ -23,7 +23,6 @@ def get_random_observation_with_x_bugged_components(x,model):
     # Get component idsf
     id_comps = []
     for comp in comps:
-        print(type(comp))
         id_comps.append(comp.get_health().get_id())
 
     # Generating random input and adding to cnf
@@ -36,28 +35,29 @@ def get_random_observation_with_x_bugged_components(x,model):
             obs.append(id_inputs[i])
             cnf.append([id_inputs[i]])
 
+    changed = set()
+    # Generate x misfunctions
+    for i in range(x):
+        rand_index = random.randint(0, len(id_comps) - 1)
+        while rand_index in changed:
+            rand_index = random.randint(0, len(id_comps) - 1)
+        changed.add(rand_index)
+        cnf.append([id_comps[rand_index]*-1])
 
     # Solve the cnf
     iter = sat_solver.itersolve(cnf)
     solution_list = list(iter)
 
-    for solution in solution_list:
-        if is_solution_valid(solution,id_comps):
-            selected = solution
+    selected = solution_list[0]
+    print("solution with misfunction")
+    print(selected)
 
     # After this we have a perfect observation
     for literal in selected:
         if abs(literal) in id_outputs:
             obs.append(literal)
-    print(obs)
-    changed = set()
-    # Generate x misfunctions
-    for i in range(x):
-        rand_index = random.randint(0, len(obs)-1)
-        while rand_index in changed:
-            rand_index = random.randint(0, len(obs)-1)
-        changed.add(rand_index)
-        obs[rand_index] = obs[rand_index] * -1
+    print("the observation")
+
     return obs
 
 
@@ -270,13 +270,14 @@ DS = [BM,COMPS,OBS]
 BM.print_name_model_cnf()
 BM.print_model_cnf()
 
-a = [1,-2,-3,4,5,-15,-17]
+num_of_bugs = 3
+a = get_random_observation_with_x_bugged_components(num_of_bugs,BM)
+print(a)
 M = 8
 N = 4
 
 diagnosis = hill_climb(DS,a,M,N)
-while len(diagnosis)!=1:
-    diagnosis = hill_climb(DS, a, M, N)
+
 print(diagnosis)
 
-print(get_random_observation_with_x_bugged_components(3,BM))
+print()

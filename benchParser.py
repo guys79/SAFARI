@@ -98,7 +98,6 @@ class benchParse:
                                 changed = True
                                 name_to_literal[num_in_string] = comp.get_output()
                                 created.add(num_in_string)
-        print(len(created))
         outputs  = self.get_outputs(text)
         out_lit  = []
         for output_name in outputs:
