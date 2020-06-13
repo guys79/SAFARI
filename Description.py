@@ -296,6 +296,12 @@ class booleanModel:
         for i in range(len(self.inputs)):
             self.names["input_%d"%(self.inputs[i].get_id())] = self.inputs[i]
 
+    def set_outputs(self,outputs):
+        self.outputs = outputs
+
+    def get_outputs(self):
+        return self.outputs
+
     def get_healthy_literals(self):
         """
         This function will return the healthy literals in the model
@@ -372,7 +378,19 @@ class booleanModel:
             except:
                 type(comp)
         return cnf_model
+    def get_components(self):
+        values = self.names.values()
+        comps = []
+        for val in values:
+            try:
+                val.get_health()
+                comps.append(val)
+            except(Exception):
+                pass
 
+        return comps
+    def get_inputs(self):
+        return self.inputs
     def print_name_model_cnf(self):
         """
         This function will print the model's name cnf (literal names instead of id's)

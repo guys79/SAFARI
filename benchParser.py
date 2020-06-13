@@ -44,6 +44,19 @@ class benchParse:
         return inputs,name_to_literal
 
 
+    def get_outputs(self,text):
+        outputs = []
+        for i in range(len(text)):
+            line = text[i]
+            if line[0] != '#':
+                output = "OUTPUT"
+                if len(line) >= len(output) + 3:
+
+                    if output == line[:len(output)]:
+                        last_bracket = line.rindex(')')
+                        name = line[len(output)+1:last_bracket].strip()
+                        outputs.append(name)
+        return outputs
 
     def parse_model(self, text):
         inputs, name_to_literal = self.get_inputs(text)
@@ -86,10 +99,16 @@ class benchParse:
                                 name_to_literal[num_in_string] = comp.get_output()
                                 created.add(num_in_string)
         print(len(created))
+        outputs  = self.get_outputs(text)
+        out_lit  = []
+        for output_name in outputs:
+            lit = name_to_literal[output_name]
+            out_lit.append(lit)
+        model.set_outputs(out_lit)
         return model
 
 
-
+"""
 from os import listdir
 from os.path import isfile, join
 
@@ -102,4 +121,6 @@ for file in onlyfiles:
     file_name = file[:file.index(".")]
     g = input("guy")
     model = bp.get_model(file_name)
+
     #model.print_name_model_cnf()
+"""
