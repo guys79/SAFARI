@@ -297,9 +297,18 @@ class booleanModel:
             self.names["input_%d"%(self.inputs[i].get_id())] = self.inputs[i]
 
     def set_outputs(self,outputs):
+        """
+        This function will set the outputs
+        :param outputs: The given outputs
+        :return: None
+        """
         self.outputs = outputs
 
     def get_outputs(self):
+        """
+        This function will return the outputs of the model
+        :return: The outputs of the model
+        """
         return self.outputs
 
     def get_healthy_literals(self):
@@ -378,7 +387,12 @@ class booleanModel:
             except:
                 type(comp)
         return cnf_model
+
     def get_components(self):
+        """
+        This function will return the components of the model
+        :return: The components of the model
+        """
         values = self.names.values()
         comps = []
         for val in values:
@@ -389,8 +403,14 @@ class booleanModel:
                 pass
 
         return comps
+
     def get_inputs(self):
+        """
+        This function will return the inputs of the model
+        :return: The inputs of the model
+        """
         return self.inputs
+
     def print_name_model_cnf(self):
         """
         This function will print the model's name cnf (literal names instead of id's)

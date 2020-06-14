@@ -3,79 +3,6 @@ import pycosat as sat_solver
 from Description import booleanModel
 import random
 
-
-def get_random_observation_with_x_bugged_components(x,model):
-    cnf = model.get_model_cnf()
-    inputs = model.get_inputs()
-    outputs = model.get_outputs()
-    comps = model.get_components()
-    obs = []
-    # Get input ids
-    id_inputs = []
-    for input in inputs:
-        id_inputs.append(input.get_id())
-
-    # Get output ids
-    id_outputs = []
-    for output in outputs:
-        id_outputs.append(output.get_id())
-
-    # Get component idsf
-    id_comps = []
-    for comp in comps:
-        id_comps.append(comp.get_health().get_id())
-
-    # Generating random input and adding to cnf
-    for i in range(len(inputs)):
-        is_1 = bool(random.getrandbits(1))
-        if not is_1:
-            obs.append(-1*id_inputs[i])
-            cnf.append([-1*id_inputs[i]])
-        else:
-            obs.append(id_inputs[i])
-            cnf.append([id_inputs[i]])
-
-    changed = set()
-    # Generate x misfunctions
-    for i in range(x):
-        rand_index = random.randint(0, len(id_comps) - 1)
-        while rand_index in changed:
-            rand_index = random.randint(0, len(id_comps) - 1)
-        changed.add(rand_index)
-        cnf.append([id_comps[rand_index]*-1])
-
-    # Solve the cnf
-    iter = sat_solver.itersolve(cnf)
-    solution_list = list(iter)
-
-    selected = solution_list[0]
-    print("solution with misfunction")
-    print(selected)
-
-    # After this we have a perfect observation
-    for literal in selected:
-        if abs(literal) in id_outputs:
-            obs.append(literal)
-    print("the observation")
-
-    return obs
-
-
-
-
-
-
-
-def is_solution_valid(solution,comp_ids):
-
-    for comp_id in comp_ids:
-        if not comp_id in solution: #comp not healthy
-            return False
-    return True
-
-
-
-
 def random_diagnosis(SD, a):
     """
     Returns a random diagnosis using SAT solver
@@ -224,6 +151,10 @@ def hill_climb(DS, a,M,N):
         n+=1
     return convert_trie_to_set_of_components(R)
 
+
+
+
+
 """
 # create model
 input_num = 3
@@ -253,31 +184,4 @@ N = 4
 print(hill_climb(DS,a,M,N))
 """
 
-from benchParser import *
-bp = benchParse()
-file_name = "c17"
-BM = bp.get_model(file_name)
 
-COMPS = BM.get_components()
-OBS = []
-for input in BM.get_inputs():
-    OBS.append(input)
-for output in BM.get_outputs():
-    OBS.append(output)
-
-DS = [BM,COMPS,OBS]
-
-BM.print_name_model_cnf()
-BM.print_model_cnf()
-
-num_of_bugs = 3
-a = get_random_observation_with_x_bugged_components(num_of_bugs,BM)
-print(a)
-M = 8
-N = 4
-
-diagnosis = hill_climb(DS,a,M,N)
-
-print(diagnosis)
-
-print()

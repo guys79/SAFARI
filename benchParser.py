@@ -2,10 +2,17 @@ import os
 from Description import *
 
 class benchParse:
-
+    """
+    This class will parse a bench file and build a boolean model
+    """
 
 
     def get_model(self,file_name):
+        """
+        This function will return the model described in the file
+        :param file_name: The name of the file
+        :return: The model described in the file
+        """
         path = "%s\\res\\%s.bench.txt" % (os.getcwd(), file_name)
         text = self.get_text(path)
         model = self.parse_model(text)
@@ -25,6 +32,11 @@ class benchParse:
 
 
     def get_inputs(self,text):
+        """
+        This function will return the inputs of the model
+        :param text: The text in the file
+        :return: The inputs of the model
+        """
         inputs = []
         name_to_literal = {}
         id = 1
@@ -45,6 +57,11 @@ class benchParse:
 
 
     def get_outputs(self,text):
+        """
+       This function will return the outputs' names of the model
+       :param text: The text in the file
+       :return: The outputs' names in the model
+       """
         outputs = []
         for i in range(len(text)):
             line = text[i]
@@ -59,6 +76,11 @@ class benchParse:
         return outputs
 
     def parse_model(self, text):
+        """
+        This function will parse the model described in the text and will return a new model
+        :param text: The text in the file
+        :return: A new model (the one described in the file)
+        """
         inputs, name_to_literal = self.get_inputs(text)
         created = set()
         changed = True
