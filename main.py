@@ -131,7 +131,7 @@ def experiment():
         N = 4
 
         # Preforming the algorithm
-        diagnosis = hill_climb(DS, a, M, N)
+        diagnosis = hill_climb(DS, a, M, N,option=1 )
 
         print(diagnosis)
 

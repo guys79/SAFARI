@@ -2,6 +2,7 @@ from DiagnosisData import DiagnosisData
 import pycosat as sat_solver
 from Description import booleanModel
 import random
+from trie import TrieNode
 
 def random_diagnosis(SD, a):
     """
@@ -77,7 +78,7 @@ def doesnt_entail_false(SD, a, w_tag):
         return False
     return True
 
-
+#works for the 2 data structures
 def is_subsumed(sub_sumed_indexes):
     """
     Ths function will check if there are diagnoses that are subsumed using the indexes
@@ -86,7 +87,7 @@ def is_subsumed(sub_sumed_indexes):
     """
     return len(sub_sumed_indexes) !=0
 
-
+#works for the 2 data structures
 def add_to_trie(R, w):
     """
     This function will add the diagnosis to the Trie
@@ -95,16 +96,17 @@ def add_to_trie(R, w):
     """
     R.add_diagnosis(w)
 
-def remove_subsumed(R,sub_sumed_indexes):
+#works for the 2 data structures
+def remove_subsumed(R, diagnoses_to_delete):
     """
     Removes from R all the diagnoses that are subsumed in w
     :param R: Thr Data Structure
-    :param sub_sumed_indexes: The diagnosis indexes to delete
+    :param diagnoses_to_delete: The diagnosis indexes to delete
     """
-    for index in sub_sumed_indexes:
-        R.delete_diagnosis(index)
+    for diagnosis in diagnoses_to_delete:
+        R.delete_diagnosis(diagnosis)
 
-
+#works for the 2 data structures
 def convert_trie_to_set_of_components(R):
     """
     This function will convert the Trie of diagnoses to a group of diagnoses
@@ -115,21 +117,27 @@ def convert_trie_to_set_of_components(R):
     pass
 
 
-def hill_climb(DS, a,M,N):
+def hill_climb(DS, a, M, N, option=1):
     """
     The Hill CLimb algorithm from the paper (The main algorithm)
+    :param option:
     :param DS: <SD,COMPS,OBS>. SD - the rules that defines the connection between the components.
                 COMPS - The components of the model. OBS - The inputs and outputs.
     :param a: The observation
     :param M: Climb restart limit
     :param N: number of tries
-    :return: The trie pf diagnoses
+    :param option: 1 if we want to use our data structure, 2 if we want to use the Trie
+    :return: list of diagnoses
     """
     SD = DS[0]
     COMPS = DS[1]
     OBS = DS[2]
-
-    R = DiagnosisData()
+    if option==1:
+        R = DiagnosisData()
+    elif option==2:
+        R=TrieNode("*")
+    else:
+        return
     n = 0
     while n < N:
         w = random_diagnosis(SD,a)
@@ -143,14 +151,13 @@ def hill_climb(DS, a,M,N):
                 m = 0
             else:
                 m +=1
-        sub_sumed_index = R.search_sub_diagnosis(w[1])
-        if not is_subsumed(sub_sumed_index):
+        sub_diagnoses = R.search_sub_diagnosis(w[1])
+        if not is_subsumed(sub_diagnoses):
             add_to_trie(R,w[1])
-            remove_subsumed(R,sub_sumed_index)
+            remove_subsumed(R,sub_diagnoses)
 
         n+=1
     return convert_trie_to_set_of_components(R)
-
 
 
 
