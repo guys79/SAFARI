@@ -6,7 +6,7 @@ class DiagnosisData():
         """
         The constructor of the class
         """
-        self.dictionary={}
+        self.dictionary={} # Component name value - list of diagnoses' indexes
         self.index=0
 
     def add_diagnosis(self,diagnosis):
