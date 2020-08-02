@@ -1,7 +1,7 @@
 import pycosat as sat_solver
 import random
-from benchParser import *
 import os
+from benchParser import benchParse
 from SAFARI import hill_climb
 
 def get_random_observation_with_x_bugged_components(x,model):
@@ -51,12 +51,15 @@ def get_random_observation_with_x_bugged_components(x,model):
         cnf.append([id_comps[rand_index]*-1])
 
     # Solve the cnf
-    iter = sat_solver.itersolve(cnf)
+    selected = sat_solver.solve(cnf)
+
+    """
     solution_list = list(iter)
 
     selected = solution_list[0]
     print("solution with misfunction")
     print(selected)
+    """
 
     # After this we have a perfect observation
     for literal in selected:
@@ -97,7 +100,7 @@ def experiment():
     :return: Experiment results
     """
     path = "%s\\res" % os.getcwd()
-    onlyfiles = [f for f in os.listdir(path) if os.isfile(os.join(path, f))]
+    onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     tests = []
     bp = benchParse()
     for file in onlyfiles:

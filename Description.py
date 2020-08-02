@@ -483,37 +483,3 @@ and_1 = BM.create_component([z,y],"and")
 
 # First OR gate
 or_0 = BM.create_component([and_0.get_output(),and_1.get_output()],"or")
-
-"""
-#print(BM.get_model_cnf())
-#print(BM.get_name_model_cnf())
-#BM.print_model_cnf()
-#BM.print_name_model_cnf()
-#BM.print_model_cnf()
-#print(BM.get_model_cnf())
-
-import pycosat
-cnf = BM.get_model_cnf()
-cnf_name = BM.get_name_model_cnf()
-obs = []
-obs.append([1])
-obs.append([2])
-obs.append([-3])
-obs.append([9])
-
-for obser in obs:
-    cnf.append(obser)
-
-list_of_sol = list(pycosat.itersolve(cnf))
-
-g = True
-for solution in list_of_sol:
-    if g:
-        print(solution)
-        healthy, sick = BM.get_diagnosis(solution)
-        print("healthy")
-        print(healthy)
-        print("sick")
-        print(sick)
-
-"""

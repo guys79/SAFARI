@@ -15,13 +15,12 @@ def random_diagnosis(SD, a):
     for observation in a:
         cnf.append([observation])
 
-    iter = sat_solver.itersolve(cnf)
+    solution = sat_solver.solve(cnf)
+    rand = random.randrange(15)
+    for i in range(rand):
+        solution = sat_solver.solve(cnf)
+        cnf.append([-x for x in solution])
 
-    solution_list = list(iter)
-    if len(solution_list) == 0:
-        raise Exception("F**k in observations")
-    random.shuffle(solution_list)
-    solution = solution_list[0]
     healthy,not_healthy = SD.get_diagnosis(solution)
     return healthy,not_healthy
 
@@ -71,10 +70,10 @@ def doesnt_entail_false(SD, a, w_tag):
     for observation in a:
         cnf_model.append([observation])
 
-    iter = sat_solver.itersolve(cnf_model)
+    sol = sat_solver.solve(cnf_model)
 
-    solution_list = list(iter)
-    if len(solution_list) == 0:
+
+    if sol == 'UNSAT':
         return False
     return True
 
@@ -113,8 +112,9 @@ def convert_trie_to_set_of_components(R):
     :param R: The Trie
     :return: The group of diagnoses
     """
-    return R.get_all_diagnosis()
-    pass
+    diagnosis =  R.get_all_diagnosis()
+
+    return diagnosis
 
 
 def hill_climb(DS, a, M, N, option=1):
@@ -146,7 +146,7 @@ def hill_climb(DS, a, M, N, option=1):
             w_tag = improved_diagnosis(w) # should be improved_diagnosis(w.p)
             if doesnt_entail_false(SD,a,w_tag):
                 if len(w_tag[1]) == 0:
-                    return []
+                    return [[]]
                 w = w_tag
                 m = 0
             else:
@@ -157,6 +157,8 @@ def hill_climb(DS, a, M, N, option=1):
             remove_subsumed(R,sub_diagnoses)
 
         n+=1
+    if R.index == 0: #No Solution
+        return None
     return convert_trie_to_set_of_components(R)
 
 
