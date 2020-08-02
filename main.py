@@ -3,6 +3,8 @@ import random
 import os
 from benchParser import benchParse
 from SAFARI import hill_climb
+import time
+import pandas as pd
 
 def get_random_observation_with_x_bugged_components(x,model):
     """
@@ -102,43 +104,58 @@ def experiment():
     path = "%s\\res" % os.getcwd()
     onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     tests = []
+    path1_results = "experiment1.csv"
+    path2_results = "experiment2.csv"
+    num_of_iteration_per_model = 3
+    options = {1,2}
     bp = benchParse()
-    for file in onlyfiles:
-        # File name
-        file_name = file[:file.index(".")]
+    dictionary = {}
+    dictionary[1] = {}
+    dictionary[2] = {}
+    for file in {"c17.","c432."}:
+        for i in range(num_of_iteration_per_model):
 
-        # The dictionary of the test
-        dictionary_test = {}
+            # File name
+            file_name = file[:file.index(".")]
+            # The dictionary of the test
+            dictionary_test = {}
 
-        # The model
-        BM = bp.get_model(file_name)
+            # The model
+            BM = bp.get_model(file_name)
 
-        # The components
-        COMPS = BM.get_components()
+            # The components
+            COMPS = BM.get_components()
 
-        # The observations (input + output)
-        OBS = []
-        for input in BM.get_inputs():
-            OBS.append(input)
-        for output in BM.get_outputs():
-            OBS.append(output)
+            # The observations (input + output)
+            OBS = []
+            for input in BM.get_inputs():
+                OBS.append(input)
+            for output in BM.get_outputs():
+                OBS.append(output)
 
-        # The final System Description
-        DS = [BM, COMPS, OBS]
+            # The final System Description
+            DS = [BM, COMPS, OBS]
 
-        # Generating observation with 'x' bugs
-        num_of_bugs = 3
-        a = get_random_observation_with_x_bugged_components(num_of_bugs, BM)
-        print(a)
-        M = 8
-        N = 4
+            # Generating observation with 'x' bugs
+            num_of_bugs = 3
+            a = get_random_observation_with_x_bugged_components(num_of_bugs, BM)
+            print(a)
+            M = 8
+            N = 4
 
-        # Preforming the algorithm
-        diagnosis = hill_climb(DS, a, M, N,option=1 )
+            for option in options:
+                if not file_name in dictionary[option]:
+                    dictionary[option][file_name] = []
+                # Preforming the algorithm
+                start = time.time()
+                diagnosis = hill_climb(DS, a, M, N, option=option)
+                end = time.time()
+                total_time = end-start
+                dictionary[option][file_name].append(total_time)
 
-        print(diagnosis)
-
-        print()
-
+    df1 = pd.DataFrame.from_dict(dictionary[1])
+    df2 = pd.DataFrame.from_dict(dictionary[2])
+    df1.to_csv(path1_results)
+    df2.to_csv(path2_results)
 if __name__ == "__main__":
     experiment()

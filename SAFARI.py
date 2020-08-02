@@ -157,8 +157,12 @@ def hill_climb(DS, a, M, N, option=1):
             remove_subsumed(R,sub_diagnoses)
 
         n+=1
-    if R.index == 0: #No Solution
-        return None
+    if option == 1:
+        if R.index == 0: #No Solution
+            return None
+    elif option == 2:
+        if len(R.children)==0:
+            return None
     return convert_trie_to_set_of_components(R)
 
 

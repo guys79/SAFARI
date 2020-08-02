@@ -74,7 +74,7 @@ class TrieNode(object):
         :return: true and the sub tree the diagnoses in, false otherwise
         """
         diagnosis_component_names = [component.name for component in diagnosis]
-        all_diagnoses = self.get_all_diagnoses()
+        all_diagnoses = self.get_all_diagnosis()
         sub_trees = []
         for element in all_diagnoses:
             if set(diagnosis_component_names).issubset(set(element)):
