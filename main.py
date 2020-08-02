@@ -1,7 +1,7 @@
 import pycosat as sat_solver
 import random
 from benchParser import *
-import os
+from os import path
 from SAFARI import hill_climb
 
 def get_random_observation_with_x_bugged_components(x,model):
@@ -97,13 +97,13 @@ def experiment():
     :return: Experiment results
     """
     path = "%s\\res" % os.getcwd()
-    onlyfiles = [f for f in os.listdir(path) if os.isfile(os.join(path, f))]
+    onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     tests = []
     bp = benchParse()
     for file in onlyfiles:
         # File name
         file_name = file[:file.index(".")]
-
+        print(file_name)
         # The dictionary of the test
         dictionary_test = {}
 
