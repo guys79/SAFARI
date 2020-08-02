@@ -483,3 +483,4 @@ and_1 = BM.create_component([z,y],"and")
 
 # First OR gate
 or_0 = BM.create_component([and_0.get_output(),and_1.get_output()],"or")
+#
