@@ -9,7 +9,8 @@ class ObservationParser:
         file_name=self.model_name+"_iscas85.obs"
         f = open("observations\\"+file_name, "r")
         observations_list=[]
-        for line in f:
+        lines = self.complete_lines(f)
+        for line in lines:
             information=line[1:len(line)-3]#get line information only
             if information[-1]!=']':
                 information=information+"]"
@@ -19,17 +20,27 @@ class ObservationParser:
             literal_array[-1]=literal_array[-1][:-1]#first literal
             observation=[]
             for i in range(len(literal_array)):
+                observation.append(literal_array[i])
+                """
                 if literal_array[i].__contains__("-"):
                     observation.append((i+1)*-1)
                 else:
                     observation.append(i+1)
+                """
             observations_list.append(observation)
         return observations_list
 
 
+    def complete_lines(self,f):
+        complete_lines = []
+        complete_line =""
+
+        for line in f:
+            complete_line+=line
+            if line[len(line)-2:] == '.\n':
+                complete_lines.append(complete_line.replace("\n",""))
+                complete_line = ""
+
+        return complete_lines
 
 
-
-#test
-parser=ObservationParser("74181")
-print(parser.get_observations())

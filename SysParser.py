@@ -2,8 +2,6 @@ import os
 from Description import literal,booleanModel
 
 
-
-
 class SysParser:
     """
     This class will parse a .sys file and build a boolean model
@@ -55,7 +53,6 @@ class SysParser:
 
 
         for component_des in system_des:
-            print(component_des)
             split = component_des.split(",")
             func_name = split[0]
             func_name = self.get_func_name(func_name)
@@ -133,5 +130,5 @@ class SysParser:
 
 
 s = SysParser()
-model = s.get_model("c7552")
+model, dictionary_to_id, dictionary_to_literal = s.get_model("c7552")
 print()

@@ -5,6 +5,8 @@ from benchParser import benchParse
 from SAFARI import hill_climb
 import time
 import pandas as pd
+from ObservationsParser import *
+from SysParser import *
 
 def get_random_observation_with_x_bugged_components(x,model):
     """
@@ -258,7 +260,83 @@ def experiment2():
         df2_quality.to_csv(path2_quality_results)
 
 
+def get_observation(observation, dictionary_names_to_ids):
+    new_obs = []
+    for obs in observation:
+        if obs[0] == '-':
+            name = obs[1:]
+            id = dictionary_names_to_ids[name]
+            new_obs.append(id*-1)
+        else:
+            name = obs
+            id = dictionary_names_to_ids[name]
+            new_obs.append(id)
+
+    return new_obs
+
+
+def experiment3():
+
+    path = "%s\\res" % os.getcwd()
+    onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+    tests = []
+
+    # num_of_iteration_per_model = 100
+
+    dictionary = {}
+
+
+    sys_parser = SysParser()
+
+    for file in onlyfiles:
+
+        # File name
+        file_name = file[:file.index(".")]
+
+
+        # The model
+        BM,dictionary_names_to_ids,dictionary_names_to_literals = sys_parser.get_model(file_name)
+
+        observations = ObservationParser(file_name).get_observations()
+        dictionary[file_name] = {}
+        path_results = "experiment3_%s.csv" % file_name
+        # The components
+        COMPS = BM.get_components()
+
+        # The observations (input + output)
+        OBS = []
+        for input in BM.get_inputs():
+            OBS.append(input)
+        for output in BM.get_outputs():
+            OBS.append(output)
+
+        # The final System Description
+        DS = [BM, COMPS, OBS]
+
+        for idx in range(len(observations)):
+            # Generating observation with 'x' bugs
+            num_of_bugs = 3
+            observation = get_observation(observations[idx],dictionary_names_to_ids)
+            a = observation
+            #print(a)
+            M = 8
+            N = 4
+
+
+            # Preforming the algorithm
+
+            diagnosis = hill_climb(DS, a, M, N)
+            min_sol = get_min_cardinality(diagnosis)
+            dictionary[file_name][idx] = min_sol
+
+        df = pd.DataFrame.from_dict(dictionary)
+        df.to_csv(path_results)
+        dictionary = {}
+
+
+
 
 if __name__ == "__main__":
-    experiment()
-    experiment2()
+    #experiment()
+    #experiment2()
+    experiment3()
