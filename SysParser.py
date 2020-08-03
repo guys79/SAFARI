@@ -114,7 +114,7 @@ class SysParser:
         for i in range(len(func_name)):
             if self.is_int(func_name[i]):
                 break
-            normal_func_name = "%s%s" % (normal_func_name,func_name[i])
+            normal_func_name = "%s%s" % (normal_func_name,func_name[i])#
         return normal_func_name
 
 
