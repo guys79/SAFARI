@@ -136,9 +136,9 @@ class Component:
             return self.xor_function()
         elif func == "xnor":
             return self.xnor_function()
-        elif func == "not":
-            return  self.not_function()
-        elif func == "buff":
+        elif func == "not" or func == "inverter":
+            return self.not_function()
+        elif func == "buff" or func == "buffer":
             return self.buff_function()
         else:
             raise Exception("Function not recognized")
@@ -285,6 +285,7 @@ class booleanModel:
         :param input_num: The number of model inputs
         """
         self.num_of_literals = 0
+        self.index = 0
         self.names = {}
         if inputs == None:
             self.inputs = []
@@ -293,8 +294,15 @@ class booleanModel:
         else:
             self.inputs = inputs
             self.num_of_literals = len(self.inputs)
+            self.index = self.num_of_literals
         for i in range(len(self.inputs)):
             self.names["input_%d"%(self.inputs[i].get_id())] = self.inputs[i]
+
+    def set_index(self,new_val):
+        self.index = new_val
+
+    def get_index(self):
+        return self.index
 
     def set_outputs(self,outputs):
         """
@@ -432,7 +440,8 @@ class booleanModel:
         :return: The literal
         """
         self.num_of_literals +=1
-        return literal(self.num_of_literals)
+        self.index+=1
+        return literal(self.index)
 
     def create_component(self,inputs,func):
         """
