@@ -182,10 +182,10 @@ def experiment2():
     onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     tests = []
 
-    max_m = 10
-    #max_m = 100
-    #num_of_iteration_per_model = 10
-    num_of_iteration_per_model = 2
+    #max_m = 10
+    max_m = 100
+    num_of_iteration_per_model = 100
+    #num_of_iteration_per_model = 2
     options = {1,2}
     bp = benchParse()
     dictionary_time = {}
@@ -194,8 +194,8 @@ def experiment2():
     dictionary_quality[1] = {}
     dictionary_time[2] = {}
     dictionary_quality[2] = {}
-    #for file in {"c17.","c432.","c499."}:
-    for file in {"c17.","c432."}:
+    for file in {"c499."}:
+    #for file in {"c17.","c432."}:
 
         # File name
         file_name = file[:file.index(".")]
@@ -295,7 +295,7 @@ def experiment3():
 
 
         # The model
-        BM,dictionary_names_to_ids,dictionary_names_to_literals = sys_parser.get_model(file_name)
+        BM, dictionary_names_to_ids, dictionary_names_to_literals = sys_parser.get_model(file_name)
 
         observations = ObservationParser(file_name).get_observations()
         dictionary[file_name] = {}
@@ -333,10 +333,74 @@ def experiment3():
         df.to_csv(path_results)
         dictionary = {}
 
+def experiment4():
 
+    path = "%s\\res" % os.getcwd()
+    onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+    tests = []
+
+    # num_of_iteration_per_model = 100
+
+    dictionary = {}
+    #max_m = 100
+    #num_of_iter = 40
+    max_m = 40
+    max_obs =10
+    num_of_iter = 10
+    sys_parser = SysParser()
+
+    for file in {"c499."}:
+    #for file in {"c499."}:
+
+        # File name
+        file_name = file[:file.index(".")]
+
+
+        # The model
+        BM, dictionary_names_to_ids, dictionary_names_to_literals = sys_parser.get_model(file_name)
+
+        observations = ObservationParser(file_name).get_observations()
+        dictionary[file_name] = {}
+        path_results = "experiment4_%s.csv" % file_name
+        # The components
+        COMPS = BM.get_components()
+
+        # The observations (input + output)
+        OBS = []
+        for input in BM.get_inputs():
+            OBS.append(input)
+        for output in BM.get_outputs():
+            OBS.append(output)
+
+        # The final System Description
+        DS = [BM, COMPS, OBS]
+
+        for idx in range(len(observations)):
+            # Generating observation with 'x' bugs
+            if idx == max_obs:
+                break
+            observation = get_observation(observations[idx],dictionary_names_to_ids)
+            a = observation
+            dictionary[file_name][idx] = {}
+            for m in range(max_m):
+
+                M = m + 1
+                N = 4
+                sum = 0
+                for j in range(num_of_iter):
+                    print("Model - %s, observation - %d/%d, M - %d/%d, iteration - %d/%d" %(file_name,idx+1,max_obs,m+1,max_m,j+1,num_of_iter))
+                    diagnosis = hill_climb(DS, a, M, N)
+                    min_sol = get_min_cardinality(diagnosis)
+                    sum+=min_sol
+                dictionary[file_name][idx][m+1] = sum/float(num_of_iter)
+
+        df = pd.DataFrame.from_dict(dictionary[file_name])
+        df.to_csv(path_results)
+        dictionary = {}
 
 
 if __name__ == "__main__":
     #experiment()
     #experiment2()
-    experiment3()
+    #experiment3()
+    experiment4()
